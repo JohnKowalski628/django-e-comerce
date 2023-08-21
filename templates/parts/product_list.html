@@ -1,0 +1,16 @@
+
+<div class="container">
+    <div class="row">
+        {% for p in list_products %}
+                <div class="card" style="width: 16rem;">
+                        <img src="{{ p.get_thumbnail }}" class="card-img-top" alt="product-image">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ p.title }}</h5>
+                        <h6 class="card-text">${{ p.price }}</h6>
+                        <a href="{% url 'product_detail' p.category.slug p.slug %}"
+                           class="btn btn-warning">View</a>
+                    </div>
+                </div>
+        {% endfor %}
+    </div>
+</div>
