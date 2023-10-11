@@ -1,0 +1,14 @@
+<div class="card" style="width: 16rem; margin-right: 0.5rem; margin-left: 0.5rem; margin-bottom: 2rem">
+    {% if subcategory.get_category_thumbnail%}
+    <img src="{{ subcategory.get_category_thumbnail }}" class="card-img-top" alt="product-image">
+    {% endif %}
+    <div class="card-body">
+        <div class="d-flex justify-content-center">
+            <h6 class="card-title">{{ subcategory.title }}</h6>
+        </div>
+        <div class="d-flex justify-content-center">
+            <a href="{% url 'category_detail' subcategory.slug %}"
+               class="btn btn-warning" style="width: 15rem;">View</a>
+        </div>
+    </div>
+</div>

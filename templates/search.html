@@ -3,8 +3,9 @@
 {% block title %}Search | {% endblock %}
 
 {% block content %}
-    <h1 class="title">Search</h1>
-    <h3 class="subtitle"> Search term: {{ query }}</h3>
+    <h1 class="d-flex justify-content-center">Search</h1>
+    <h3 class="d-flex justify-content-center"> Search term: {{ query }}</h3>
+    <br>
 
     {% with products as list_products %}
         {% include 'parts/product_list.html' %}

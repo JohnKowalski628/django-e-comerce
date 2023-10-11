@@ -1,13 +1,11 @@
 <div class="newsletter-wrapper" id="newsletter-wrapper">
-    <h2 class="subtitle">Subscribe to our newsletter</h2>
+    <h2 class="subtitle text-light">Subscribe to our newsletter</h2>
 
     <form v-on:submit.prevent="onSubmit">
-        <div class="field has-addons">
-            <div class="control">
-                <input type="email" v-model="email" class="input" placeholder="Your e-mail address...">
-            </div>
-            <div class="control">
-                <button class="button is-success">Submit</button>
+        <div class="container">
+            <div class="row d-flex justify-content-center">
+                <input type="email" v-model="email" class="input" placeholder="Your e-mail address..." >
+                <button class="btn btn-success" style="margin-right: 0.5rem; margin-left: 0.5rem">Submit</button>
             </div>
         </div>
     </form>

@@ -3,7 +3,7 @@
 {% block title %}{{ product.title }} | {% endblock %}
 
 {% block content %}
-    <div id="productapp">
+    <div class="container" id="productapp">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb bg-white">
                 <li class="breadcrumb-item"><a href="{% url 'frontpage' %}">Home</a></li>
@@ -17,160 +17,125 @@
                 <li class="breadcrumb-item active" aria-current="page"><a>{{ product.title }}</a></li>
             </ol>
         </nav>
-        <img :src="mainImage" class="img-fluid" alt="product image">
-        {% if product.images.all %}
-            <hr>
+        <div class="container">
+            <div class="row">
+                <div class="col-sm">
+                    <img :src="mainImage" class="img-fluid" alt="product image">
+                    {% if product.images.all %}
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm" v-for="image in images">
+                                <img :src="image.thumbnail" @click="changeMainImage(image.image)"
+                                     class="img-fluid d-flex-justify-content-between">
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    <div>
+                        <h1 class="title">{{ product.title }}</h1>
+                        <br>
+                        <h2 class="subtitle">${{ product.price }}</h2>
+                        <br>
+                        <h2>Stars: {% if product.get_rating == 0 %}No ratings yet{% else %}
+                            {{ product.get_rating|floatformat:1 }}{% endif %}</h2>
+                        <br>
+                        {% if product.description %}
+                            <p>{{ product.description }}</p>
+                        {% endif %}
+                        <br>
+                        {% if product.in_cart %}
+                            <p>Already in cart!</p>
+                        {% else %}
+                            {% if product.num_available > 0 %}
+                                <button @click="addToCart({{ product.id }})" class="btn btn-success">Add to
+                                    cart
+                                </button>
+                            {% else %}
+                                <p>The product is out of stock!</p>
+                            {% endif %}
+                        {% endif %}
+                        <br>
+                    </div>
+                    <br>
+                    <div class="alert alert-success" role="alert" v-if="showMessage">
+                        The product was added to the cart!
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br>
+        <hr>
+    {% if product_variants%}
+        <div class="container">
+            <h2>Variants</h2>
+            <br>
+            {% with product_variants as list_products %}
+                {% include 'parts/product_list.html' %}
+            {% endwith %}
+        </div>
+        <br>
+        <hr>
+    {% endif %}
+        <div class="container">
+            <h2>Related products</h2>
+        <br>
+            {% with related_products as list_products %}
+                {% include 'parts/product_list.html' %}
+            {% endwith %}
+        </div>
+        <br>
+        <hr>
+        <div class="container">
+            <h2>Reviews</h2>
+            <br>
             <div>
-                <div v-for="image in images">
-                    <img :src="image.thumbnail" @click="changeMainImage(image.image)" class="img-fluid">
-                </div>
+                {% for review in product.reviews.all %}
+                    <div class="alert alert-secondary" role="alert">
+                        <p>
+                            <strong>Date:</strong>{{ review.date_added|date:"Y-m-d" }},
+                            <strong>Stars:</strong>{{ review.stars }}
+                        </p>
+                        {{ review.content }}
+                    </div>
+                {% empty %}
+                    <div class="alert alert-secondary" role="alert">
+                        No reviews yet...
+                    </div>
+                {% endfor %}
             </div>
-        {% endif %}
-        <hr>
-        <h1 class="title">{{ product.title }}</h1>
-        <h2 class="subtitle">${{ product.price }}, Stars: {% if product.get_rating == 0 %}No ratings yet{% else %}
-            {{ product.get_rating|floatformat:1 }}{% endif %}</h2>
+            <div class="alert alert-secondary">
+                {% if request.user.is_authenticated %}
+                    <form method="post" action=".">
+                        {% csrf_token %}
 
-        {% if product.description %}
-            <p>{{ product.description }}</p>
-        {% endif %}
+                        <div class="form-group">
+                            <label for="commentSelect">Stars</label>
+                            <select name="stars" id="commentSelect">
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3" selected>3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                            </select>
+                        </div>
 
-        <h2 class="subtitle">Variants</h2>
+                        <div class="form-group">
+                            <label for="commentTextArea">Content</label>
+                            <textarea class="form-control" name="content" id="commentTextArea" rows="3"></textarea>
+                        </div>
 
-        {% if product.variants.all %}
-            <div class="columns">
-                <div class="column is-6">
-                    <table class="table is-fullwidth">
-                        <tbody>
-                        <tr>
-                            <td>
-                                <figure class="image is-48x48">
-                                    {% if product.thumbnail.url %}
-                                        <img src="{{ product.thumbnail.url }}">
-                                    {% endif %}
-                                </figure>
-                            </td>
-
-                            <td>
-                                {{ product.title }}
-                            </td>
-
-                            <td>
-                                {% if product.in_cart %}
-                                    <p>Already in cart!</p>
-                                {% else %}
-                                    {% if product.num_available > 0 %}
-                                        <button @click="addToCart({{ product.id }})" class="button is-success">Add to
-                                            cart
-                                        </button>
-                                    {% else %}
-                                        <p>The product is out of stock!</p>
-                                    {% endif %}
-                                {% endif %}
-                            </td>
-                        </tr>
-
-                        {% for variant in product.variants.all %}
-                            <tr>
-                                <td>
-                                    <figure class="image is-48x48">
-                                        {% if variant.thumbnail.url %}
-                                            <img src="{{ variant.thumbnail.url }}">
-                                        {% endif %}
-                                    </figure>
-                                </td>
-
-                                <td>
-                                    {{ variant.title }}
-                                </td>
-
-                                <td>
-                                    {% if variant.in_cart %}
-                                        <p>Already in cart!</p>
-                                    {% else %}
-                                        {% if variant.num_available > 0 %}
-                                            <button @click="addToCart({{ variant.id }})" class="button is-success">Add
-                                                to cart
-                                            </button>
-                                        {% else %}
-                                            <p>The product is out of stock!</p>
-                                        {% endif %}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        {% else %}
-            {% if product.in_cart %}
-                <p>Already in cart!</p>
-            {% else %}
-                {% if product.num_available > 0 %}
-                    <button @click="addToCart({{ product.id }})" class="button is-success">Add to cart</button>
+                        <div class="form-group">
+                            <button class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
                 {% else %}
-                    <p>The product is out of stock!</p>
+                    <p>Please sign in to add review!</p>
                 {% endif %}
-            {% endif %}
-        {% endif %}
-
-        <div class="alert alert-success" role="alert" v-if="showMessage">
-            The product was added to the cart!
-        </div>
-
-        <hr>
-        <h2>Related products</h2>
-        {% with related_products as list_products %}
-            {% include 'parts/product_list.html' %}
-        {% endwith %}
-        <hr>
-        <h2>Reviews</h2>
-        <div>
-            {% for review in product.reviews.all %}
-                <div class="alert alert-secondary" role="alert">
-                    <p>
-                        <strong>Date:</strong>{{ review.date_added|date:"Y-m-d" }},
-                        <strong>Stars:</strong>{{ review.stars }}
-                    </p>
-                    {{ review.content }}
-                </div>
-            {% empty %}
-                <div class="alert alert-secondary" role="alert">
-                    No reviews yet...
-                </div>
-            {% endfor %}
-        </div>
-        <div class="alert alert-secondary">
-            {% if request.user.is_authenticated %}
-                <form method="post" action=".">
-                    {% csrf_token %}
-
-                    <div class="form-group">
-                        <label for="commentSelect">Stars</label>
-                        <select name="stars" id="commentSelect">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3" selected>3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="commentTextArea">Content</label>
-                        <textarea class="form-control" name="content" id="commentTextArea" rows="3"></textarea>
-                    </div>
-
-                    <div class="form-group">
-                        <button class="btn btn-success">Submit</button>
-                    </div>
-                </form>
-            {% else %}
-                <p>Please sign in to add review!</p>
-            {% endif %}
+            </div>
         </div>
     </div>
+    <br>
 {% endblock %}
 
 {% block scripts %}

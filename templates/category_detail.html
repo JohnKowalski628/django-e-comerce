@@ -1,87 +1,91 @@
 {% extends 'base.html' %}
 {% block content %}
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb bg-white">
-            <li class="breadcrumb-item"><a href="{% url 'frontpage' %}">Home</a></li>
-            {% if category.parent %}
-                <li class="breadcrumb-item"><a
-                        href="{% url 'category_detail' category.parent.slug %}">{{ category.parent.title }}</a></li>
-            {% endif %}
-            <li class="breadcrumb-item active" aria-current="page"><a>{{ category.title }}</a></li>
-        </ol>
-    </nav>
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb bg-white">
+                <li class="breadcrumb-item"><a href="{% url 'frontpage' %}">Home</a></li>
+                {% if category.parent %}
+                    <li class="breadcrumb-item"><a
+                            href="{% url 'category_detail' category.parent.slug %}">{{ category.parent.title }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page"><a>{{ category.title }}</a></li>
+            </ol>
+        </nav>
 
-    <h1 class="title">{{ category.title }}</h1>
+        <h1 class="title">{{ category.title }}</h1>
+    <br>
 
-    {% if category.children.all %}
-        {% for subcategory in category.children.all %}
-            <div>
-                <h2>{{ subcategory.title }}</h2>
-                <a href="{% url 'category_detail' subcategory.slug %}">View products</a>
-            </div>
-        {% endfor %}
-    {% else %}
-        <hr>
-
-        <form method="get" action="{% url 'category_detail' category.slug %}">
-            <div class="columns is-multiline">
-                <div class="column is-4">
-                    <h2 class="is-size-5">Price range</h2>
-
-                    <div class="field">
-                        <label>From</label>
-                        <div class="control">
-                            <input type="number" name="price_from" class="input" value="{{ price_from }}">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>To</label>
-                        <div class="control">
-                            <input type="number" name="price_to" class="input" value="{{ price_to }}">
-                        </div>
-                    </div>
+        {% if category.children.all %}
+            <div class="container">
+                <div class="row d-flex justify-content-between">
+                    {% for subcategory in category.children.all %}
+                        {% include 'parts/category_card.html' %}
+                    {% endfor %}
                 </div>
+            </div>
+        {% else %}
+            <hr>
 
-                <div class="column is-4">
-                    <h2 class="is-size-5">Sorting</h2>
+            <form method="get" action="{% url 'category_detail' category.slug %}">
+                <div class="d-flex justify-content-between">
+                    <div class="container">
+                        <h2 class="is-size-5">Price range</h2>
 
-                    <div class="field">
-                        <label>Select sorting criteria</label>
+                        <div class="form-group">
+                            <label>From</label>
+                            <div class="control">
+                                <input type="number" name="price_from" class="input" value="{{ price_from }}">
+                            </div>
+                        </div>
 
-                        <div class="control">
-                            <div class="select">
-                                <select name="sorting">
-                                    <option value="-date_added"{% if sorting == '-date_added' %} selected{% endif %}>
-                                        Newest first
-                                    </option>
-                                    <option value="price"{% if sorting == 'price' %} selected{% endif %}>Price
-                                        low-high
-                                    </option>
-                                    <option value="-price"{% if sorting == '-price' %} selected{% endif %}>Price
-                                        high-low
-                                    </option>
-                                </select>
+                        <div class="form-group">
+                            <label>To</label>
+                            <div class="control">
+                                <input type="number" name="price_to" class="input" value="{{ price_to }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container">
+                        <h2 class="is-size-5">Sorting</h2>
+
+                        <div class="form-group">
+                            <label>Select sorting criteria</label>
+
+                            <div class="control">
+                                <div class="form-group">
+                                    <select name="sorting">
+                                        <option value="-date_added"{% if sorting == '-date_added' %}
+                                                selected{% endif %}>
+                                            Newest first
+                                        </option>
+                                        <option value="price"{% if sorting == 'price' %} selected{% endif %}>Price
+                                            low-high
+                                        </option>
+                                        <option value="-price"{% if sorting == '-price' %} selected{% endif %}>Price
+                                            high-low
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-grop">
+                                    <br>
+                                    <button type="submit" class="btn btn-success " style="width: 10rem;">Search</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </form>
 
-                <div class="column is-12">
-                    <div class="field">
-                        <div class="control">
-                            <button class="button is-success">Search</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </form>
-
-        <hr>
-        {% with products as list_products %}
-            {% include 'parts/product_list.html' %}
-        {% endwith %}
-    {% endif %}
+            <hr>
+            <br>
+            {% with products as list_products %}
+                {% include 'parts/product_list.html' %}
+            {% endwith %}
+        {% endif %}
+    </div>
+    <br>
+    <br>
 
 
 {% endblock %}

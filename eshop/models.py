@@ -13,6 +13,9 @@ class Category(models.Model):
     ordering = models.IntegerField(default=0)
     is_featured = models.BooleanField(default=False)
 
+    category_image = models.ImageField(upload_to='uploads/', blank=True, null=True)
+    category_thumbnail = models.ImageField(upload_to='uploads/', blank=True, null=True)
+
     class Meta:
         verbose_name_plural = 'Categories'
         ordering = ('ordering',)
@@ -22,6 +25,36 @@ class Category(models.Model):
 
     def get_absolute_url(self):
         return '/%s/' % self.slug
+
+    def get_category_thumbnail(self):
+            if self.category_thumbnail:
+                return self.category_thumbnail.url
+            else:
+                if self.category_image:
+                    self.category_thumbnail = self.make_category_thumbnail(self.category_image)
+                    self.save()
+
+                    return self.category_thumbnail.url
+                else:
+                    return ''
+
+    def make_category_thumbnail(self, category_image, size=(300, 200)):
+        img = Image.open(category_image)
+        img.convert('RGB')
+        img.thumbnail(size)
+
+        thumb_io = BytesIO()
+        img.save(thumb_io, 'JPEG', quality=85)
+
+        category_thumbnail = File(thumb_io, name=category_image.name)
+
+        return category_thumbnail
+
+
+class CategoryImage(models.Model):
+    category = models.ForeignKey(Category, related_name='category_images', on_delete=models.CASCADE)
+
+    category_image = models.ImageField(upload_to='uploads/', blank=True, null=True)
 
 
 class Product(models.Model):
